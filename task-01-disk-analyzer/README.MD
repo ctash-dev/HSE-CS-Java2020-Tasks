@@ -13,4 +13,4 @@ Disk Analyzer
 Выводит время работы.
 
 Должно работать через следующую команду:
-`gradle :task-01:run --args 'path/to/folder'`
+`gradle :task-01:run --args 'path/to/folder'` из корня репозитория, либо `gradle run --args 'path/to/folder'` из этой папки
