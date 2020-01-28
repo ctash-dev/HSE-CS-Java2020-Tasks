@@ -1,0 +1,6 @@
+rootProject.name = 'HSE-CS-Java2020-Tasks'
+
+include ':task-01-disk-analyzer'
+include ':task-02-multilevel-cache'
+include ':task-03-telegram-random-coffee'
+include ':task-04-webapp-random-coffee'

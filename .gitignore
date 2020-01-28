@@ -1,0 +1,24 @@
+# Build Stuff
+.gradle/
+build/
+classes/
+*.class
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Eclipse
+.classpath
+.project
+
+# Idea
+/.idea/*
+*.iml
+
+# Idea exceptions
+!/.idea/copyright/
+!/.idea/scopes/
+
+# Windows & OSX garbage
+.DS_Store
+Thumbs.db

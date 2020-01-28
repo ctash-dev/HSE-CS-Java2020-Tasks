@@ -1,0 +1,6 @@
+version '1.0'
+
+mainClassName = 'ru.hse.cs.java2020.task01.Main'
+
+dependencies {
+}

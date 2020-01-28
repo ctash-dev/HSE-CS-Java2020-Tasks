@@ -1,0 +1,40 @@
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    group 'ru.hse.cs.java2020'
+}
+
+ext.libsVersions = [
+    junit   : '4.13',
+]
+ext.libs = [
+    junit   : "junit:junit:${libsVersions.junit}"
+]
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'application'
+
+    sourceCompatibility = JavaVersion.VERSION_11
+    test {
+        testLogging.showStandardStreams = true
+    }
+
+    apply plugin: 'checkstyle'
+    tasks.withType(Checkstyle) {
+        def configDir = project.rootProject.file('config/checkstyle')
+        configProperties = ['config-dir' : configDir]
+        configFile = new File(configDir, 'checkstyle.xml')
+        showViolations = true
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+
+    dependencies {
+        testCompile libs.junit
+    }
+}
