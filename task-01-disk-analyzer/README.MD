@@ -12,5 +12,5 @@ Disk Analyzer
 путем.
 Выводит время работы.
 
-Должно работать через следующую команду:
-`gradle :task-01:run --args 'path/to/folder'` из корня репозитория, либо `gradle run --args 'path/to/folder'` из этой папки
+* Должен проходить Checkstyle `gradle :task-01-disk-analyzer:check` из корня репозитория, либо `gradle check` из этой папки
+* Сама программа должна работать через следующую команду:`gradle :task-01-disk-analyzer:run --args 'path/to/folder'` из корня репозитория, либо `gradle run --args 'path/to/folder'` из этой папки
