@@ -2,37 +2,32 @@ package ru.hse.cs.java2020.task01;
 
 import java.text.SimpleDateFormat;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Queue;
-import java.util.PriorityQueue;
-import java.util.Collections;
+import java.util.*;
 
 public class Main {
     private static File rootLib;
-    private static int countMax;
+    private static int countMax = 5;
 
-    static class Returning {
-        private File nameFile;
-        private long countFiles, countFolders, totalSize;
-        private List<File> biggestFiles;
+    static class returning {
+        File nameFile;
+        long countFiles, countFolders, totalSize;
+        List<File> biggestFiles;
 
-        Returning() {
+        returning() {
             nameFile = null;
             countFiles = 0;
             countFolders = 0;
             totalSize = 0;
             biggestFiles = new ArrayList<>();
         }
-        Returning(File path) {
+        returning(File path) {
             nameFile = path;
             countFiles = 0;
             countFolders = 0;
             totalSize = 0;
             biggestFiles = new ArrayList<>();
         }
-        Returning(long size, File path) {
+        returning(long size, File path) {
             nameFile = path;
             countFiles = -1;
             countFolders = -1;
@@ -42,23 +37,25 @@ public class Main {
     }
 
     static class FileSizeComparator implements Comparator<File> {
-        public int compare(File a, File b) {
+        public int compare( File a, File b ) {
             long aSize = a.length();
             long bSize = b.length();
-            if (aSize == bSize) {
+            if ( aSize == bSize ) {
                 return 0;
-            } else {
+            }
+            else {
                 return Long.compare(aSize, bSize) * -1;
             }
         }
     }
-    static class FinalSizeComparator implements Comparator<Returning> {
-        public int compare(Returning a, Returning b) {
+    static class FinalSizeComparator implements Comparator<returning> {
+        public int compare( returning a, returning b ) {
             long aSize = a.totalSize;
             long bSize = b.totalSize;
-            if (aSize == bSize) {
+            if ( aSize == bSize ) {
                 return 0;
-            } else {
+            }
+            else {
                 return Long.compare(aSize, bSize) * -1;
             }
         }
@@ -75,9 +72,8 @@ public class Main {
             rootLib = new File(args[0]);
             try {
                 countMax = Integer.parseInt(args[1]);
-                if (countMax < 0) {
+                if (countMax < 0)
                     throw new NumberFormatException();
-                }
             } catch (NumberFormatException e) {
                 System.err.println("Incorrect number of biggest files");
                 return 1;
@@ -91,18 +87,21 @@ public class Main {
         return 0;
     }
 
-    private static Returning getContaining(File toCheck) {
+    private static returning getContaining(File toCheck) {
         Queue<File> containing = new PriorityQueue<>();
-        Returning ret = new Returning(toCheck);
+        returning ret = new returning(toCheck);
 
-        Collections.addAll(containing, toCheck.listFiles());
+        Collections.addAll(containing, Objects.requireNonNull(toCheck.listFiles()));
 
-        while (!containing.isEmpty()) {
+        while (!containing.isEmpty())
+        {
             File currentFile = containing.remove();
-            if (currentFile.isDirectory()) {
-                if (currentFile.listFiles() != null) {
+            if (currentFile.isDirectory())
+            {
+                if (currentFile.listFiles() != null)
+                {
                     ret.countFolders++;
-                    Collections.addAll(containing, currentFile.listFiles());
+                    Collections.addAll(containing, Objects.requireNonNull(currentFile.listFiles()));
                 }
             } else {
                 // Updating list of big files
@@ -125,27 +124,26 @@ public class Main {
 
     public static void main(String[] args) {
         Queue<File> containing = new PriorityQueue<>();
-        List<Returning> resultList = new ArrayList<>();
+        List<returning> resultList = new ArrayList<>();
         List<File> biggestFiles = new ArrayList<>();
         final long startTime = System.currentTimeMillis();
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss z");
+        SimpleDateFormat formatter= new SimpleDateFormat("HH:mm:ss z");
 
-        if (setPathAndNumMax(args) != 0) {
+        if (setPathAndNumMax(args) != 0)
             return;
-        }
 
-        Collections.addAll(containing, rootLib.listFiles());
+        Collections.addAll(containing, Objects.requireNonNull(rootLib.listFiles()));
 
         long totalSize = getContaining(rootLib).totalSize;
 
-        while (!containing.isEmpty()) {
+        while (!containing.isEmpty())
+        {
             File currentFile = containing.remove();
 
             if (currentFile.isDirectory()) {
                 File[] tmp = currentFile.listFiles();
-                if (tmp != null) {
+                if (tmp != null)
                     resultList.add(getContaining(currentFile));
-                }
             } else {
                 if (countMax > 0) {
                     if (biggestFiles.size() < countMax) {
@@ -155,31 +153,28 @@ public class Main {
                         biggestFiles.sort(new FileSizeComparator());
                     }
                 }
-                resultList.add(new Returning(currentFile.length(), currentFile));
+                resultList.add(new returning(currentFile.length(), currentFile));
             }
 
         }
 
         resultList.sort(new FinalSizeComparator());
-        final int kbdiv = 1024;
-        final int hundred = 100;
-        final int thouthand = 1000;
-        System.out.printf("%-10s | %-60s | %-22s | %-15s | %-15s | %-15s | %n",
-                "Number", "Path", "Total size", "Percent size", "Count files", "Count folders");
-        for (int i = 0; i < resultList.size(); i++) {
-            Returning ex = resultList.get(i);
 
-            if (ex.nameFile.isDirectory()) {
-                System.out.printf("%-10d | %-60s | %-15d kbytes | %-15f | %-15d | %-15d | %n", i + 1,
-                        ex.nameFile.getPath().substring(args[0].length() - 1, ex.nameFile.getPath().length() - 1),
-                        ex.totalSize / kbdiv, (double) ex.totalSize / totalSize * hundred, ex.countFiles, ex.countFolders);
-                if (ex.biggestFiles != null) {
+        System.out.printf("%-10s | %-60s | %-22s | %-15s | %-15s | %-15s | %n", "Number", "Path", "Total size", "Percent size", "Count files", "Count folders");
+        for (int i = 0; i < resultList.size(); i++) {
+            returning ex = resultList.get(i);
+
+            if (ex.nameFile.isDirectory())
+            {
+                System.out.printf("%-10d | %-60s | %-15d kbytes | %-15f | %-15d | %-15d | %n", i+1,
+                        ex.nameFile.getPath().substring(args[0].length(), ex.nameFile.getPath().length()),
+                        ex.totalSize / 1024, (double)ex.totalSize / totalSize * 100, ex.countFiles, ex.countFolders);
+                if (ex.biggestFiles != null)
                     biggestFiles.addAll(ex.biggestFiles);
-                }
             } else {
-                System.out.printf("%-10d | %-60s | %-15d kbytes | %-15f | %-15s | %-15s | %n", i + 1,
-                        ex.nameFile.getPath().substring(args[0].length() - 1, ex.nameFile.getPath().length() - 1),
-                        ex.totalSize / kbdiv, (double) ex.totalSize / totalSize * hundred, "that's file", "that's file");
+                System.out.printf("%-10d | %-60s | %-15d kbytes | %-15f | %-15s | %-15s | %n", i+1,
+                        ex.nameFile.getPath().substring(args[0].length(), ex.nameFile.getPath().length()),
+                        ex.totalSize / 1024, (double)ex.totalSize / totalSize * 100, "that's file", "that's file");
             }
         }
         biggestFiles.sort(new FileSizeComparator());
@@ -187,14 +182,12 @@ public class Main {
         if (countMax > 0) {
             System.out.println("\n\nBiggest files:");
             System.out.printf("%-10s | %-160s | %-22s | %n", "Number", "Path", "Size");
-        }
-        for (int i = 0; i < countMax; i++) {
-            System.out.printf("%-10d | %-160s | %-15d kbytes | %n",
-                    i + 1, biggestFiles.get(i).getPath(), biggestFiles.get(i).length() / kbdiv);
+        
+            for (int i = 0; i < countMax; i++) {
+                System.out.printf("%-10d | %-160s | %-15d kbytes | %n", i+1, biggestFiles.get(i).getPath(), biggestFiles.get(i).length() / 1024);
+            }
         }
 
-        System.out.println("Total folder size: " + totalSize / kbdiv + " kbytes\nWork time: "
-                + ((System.currentTimeMillis() - startTime) / thouthand)  + "c "
-                + ((System.currentTimeMillis() - startTime) % thouthand) + "ms");
+        System.out.println("Total folder size: "+ totalSize / 1024 + " kbytes\nWork time: " + ((System.currentTimeMillis() - startTime) / 1000)  + "c " + ((System.currentTimeMillis() - startTime) % 1000) + "ms");
     }
 }
