@@ -1,8 +1,7 @@
 package ru.hse.cs.java2020.task03;
 
+
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class PostgrBD {
@@ -50,7 +49,7 @@ public class PostgrBD {
 
     public void insertData(String chat_id, BDInfo userInfo) throws SQLException {
         statement = connection.createStatement();
-        String req = "INSERT INTO public.\"BotTable\"(username, chatid, orgid, token) VALUES (" + "'" + userInfo.Username() +"'" + ", '" + chat_id+ "'," + "'" + userInfo.Org() + "'" + "," + "'" + userInfo.Token() + "')";
+        String req = "INSERT INTO public.\"BotTable\"(username, chatid, orgid, token) VALUES (" + "'" + userInfo.getUsername() +"'" + ", '" + chat_id+ "'," + "'" + userInfo.getOrg() + "'" + "," + "'" + userInfo.getToken() + "')";
         statement.executeUpdate(req);
     }
 }

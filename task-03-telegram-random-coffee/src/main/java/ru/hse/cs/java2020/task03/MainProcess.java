@@ -80,7 +80,7 @@ public class MainProcess {
             ShowInfo(chatId);
         } else {
             try {
-                var task = TrClient.getTask(userInfo.get().Token(), userInfo.get().Org(), request[1]);
+                var task = TrClient.getTask(userInfo.get().getToken(), userInfo.get().getOrg(), request[1]);
 
                 sendMessage(chatId, "task name: " + task.getName());
                 sendMessage(chatId, "description: " + task.getDescription());
@@ -135,11 +135,11 @@ public class MainProcess {
         } else {
             // no assignee
             if (request.length == 4) {
-                newTask = TrClient.createTask(userInfo.get().Token(), userInfo.get().Org(), request[1],
+                newTask = TrClient.createTask(userInfo.get().getToken(), userInfo.get().getOrg(), request[1],
                         request[2], Optional.empty(), request[3]);
             } // for user assign
             else {
-                newTask = TrClient.createTask(userInfo.get().Token(), userInfo.get().Org(), request[1],
+                newTask = TrClient.createTask(userInfo.get().getToken(), userInfo.get().getOrg(), request[1],
                         request[2], Optional.of(request[4]), request[3]);
             }
             if (newTask.isPresent()) {
@@ -159,8 +159,8 @@ public class MainProcess {
         }
 
         try {
-            var tasks = TrClient.getTasksByUser(userInfo.get().Token(), userInfo.get().Org(),
-                    userInfo.get().Username());
+            var tasks = TrClient.getTasksByUser(userInfo.get().getToken(), userInfo.get().getOrg(),
+                    userInfo.get().getUsername());
             int maxTasks = 1;
             if (request.length > 1) {
                 maxTasks = Integer.parseInt(request[1]);
@@ -198,7 +198,7 @@ public class MainProcess {
                 sendMessage(chatId, "No Authorization has been provided");
                 return;
             }
-            var queues = TrClient.getAllQueues(userInfo.get().Token(), userInfo.get().Org());
+            var queues = TrClient.getAllQueues(userInfo.get().getToken(), userInfo.get().getOrg());
 
             sendMessage(chatId, "Current queues:");
             for (var queue : queues) {

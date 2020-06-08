@@ -9,14 +9,14 @@ public class BDInfo {
         this.username = name;
     }
 
-    public String Token() {
+    public String getToken() {
         return token;
     }
-    public String Org() {
+    public String getOrg() {
         return org;
     }
 
-    public String Username() {
+    public String getUsername() {
         return username;
     }
 
