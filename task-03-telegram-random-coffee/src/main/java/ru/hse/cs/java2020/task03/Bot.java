@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
 
-    static List<ArrayList<String>> updates = new ArrayList<ArrayList<String>>();
+    private static final List<ArrayList<String>> updates = new ArrayList<ArrayList<String>>();
     private static String TOKEN = null;
     private static String USERNAME = null;
 
@@ -66,7 +66,8 @@ public class Bot extends TelegramLongPollingBot {
             message.add(update.getMessage().getChatId().toString());
             message.add(update.getMessage().getText());
             updates.add(message);
-            sendMsg(update.getMessage().getChatId().toString(), update.getMessage().getChatId().toString() + " your request is being proceeded");
+            sendMsg(update.getMessage().getChatId().toString(),
+                    update.getMessage().getChatId().toString() + " your request is being proceeded");
         }
     }
 

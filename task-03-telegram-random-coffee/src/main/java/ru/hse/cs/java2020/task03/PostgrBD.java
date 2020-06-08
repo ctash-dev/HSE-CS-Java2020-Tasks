@@ -10,10 +10,10 @@ public class PostgrBD {
     private static Statement statement;
 
     public PostgrBD() {
-        SetConnection();
+        setConnection();
     }
 
-    public void SetConnection() {
+    public void setConnection() {
         try {
             connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/JavaDB", "postgres", "1001");
         } catch (SQLException throwables) {
@@ -29,7 +29,8 @@ public class PostgrBD {
 
         try {
             statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT \"token\", \"orgid\", \"username\" FROM public.\"BotTable\" WHERE \"chatid\" = '" + chatId + "'");
+            ResultSet resultSet = statement.executeQuery("SELECT \"token\", \"orgid\", \"username\" FROM public.\"BotTable\" WHERE \"chatid\" = '"
+                    + chatId + "'");
 
             if (!resultSet.isBeforeFirst()) {
                 return Optional.empty();
@@ -47,9 +48,11 @@ public class PostgrBD {
         return Optional.of(new BDInfo(token, orgid, username));
     }
 
-    public void insertData(String chat_id, BDInfo userInfo) throws SQLException {
+    public void insertData(String chatid, BDInfo userInfo) throws SQLException {
         statement = connection.createStatement();
-        String req = "INSERT INTO public.\"BotTable\"(username, chatid, orgid, token) VALUES (" + "'" + userInfo.getUsername() +"'" + ", '" + chat_id+ "'," + "'" + userInfo.getOrg() + "'" + "," + "'" + userInfo.getToken() + "')";
+        String req = "INSERT INTO public.\"BotTable\"(username, chatid, orgid, token) VALUES ("
+                + "'" + userInfo.getUsername() + "'" + ", '" + chatid + "',"
+                + "'" + userInfo.getOrg() + "'" + "," + "'" + userInfo.getToken() + "')";
         statement.executeUpdate(req);
     }
 }

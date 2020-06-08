@@ -9,78 +9,80 @@ import java.util.Optional;
 
 public class MainProcess {
 
-    private Bot TGbot;
-    private PostgrBD Postgrdb;
-    private Client TrClient;
+    private final Bot tgbot;
+    private final PostgrBD postgrdb;
+    private final Client trClient;
     private int counterPage = 0;
 
-    public MainProcess(Bot tgbot, PostgrBD DB, Client client) {
-        TGbot = tgbot;
-        Postgrdb = DB;
-        TrClient = client;
+    public MainProcess(Bot telegrambot, PostgrBD DB, Client client) {
+        tgbot = telegrambot;
+        postgrdb = DB;
+        trClient = client;
     }
 
-    public void Update(String chatId, String[] request) throws SQLException, TelegramApiException {
+    public void updater(String chatId, String[] request) throws SQLException, TelegramApiException {
         switch (request[0]) {
             case "/authorize":
-                Authorize(chatId, request);
+                authorize(chatId, request);
                 break;
             case "/gettask":
-                GetTask(chatId, request);
+                getTask(chatId, request);
                 break;
             case "/createtask":
-                CreateTask(chatId, request);
+                createTask(chatId, request);
                 break;
             case "/showqueues":
-                ShowQueues(chatId);
+                showQueues(chatId);
                 break;
             case "/showmytasks":
                 counterPage = 0;
-                ShowMyTasks(chatId, request);
+                showMyTasks(chatId, request);
                 break;
             case "/continue":
-                ShowMyTasks(chatId, request);
+                showMyTasks(chatId, request);
                 break;
             default:
-                ShowInfo(chatId);
+                showInfo(chatId);
                 break;
         }
     }
 
-    public void ShowInfo(String chatId) throws TelegramApiException {
-        sendMessage(chatId, "Command list:\n"
-                + "Here you can recieve your personal token https://oauth.yandex.ru/authorize?response_type=token&client_id=b93d753ee4bf4a2caf8b4798025816ca \n"
-                + "/authorize TrackerToken X-Org-Id Username - to start using TrackerBot\n"
-                + "/createtask TaskName TaskDescription Queue [assignee] - to create a task with following parameters\n"
-                + "/gettask TaskId - to find task by Id and show main info\n"
-                + "/getQueues - to show all queues in Dashboard. Use it to create new tasks\n"
-                + "/getMyTasks [number] - to get tasks where you are an assignee \n Use new line as a separator \n");
+    public void showInfo(String chatId) throws TelegramApiException {
+        sendMessage(chatId,
+                "Command list:\n"
+                        + "Here you can recieve your personal token"
+                        + "https://oauth.yandex.ru/authorize?response_type=token&client_id=b93d753ee4bf4a2caf8b4798025816ca \n"
+                        + "/authorize TrackerToken X-Org-Id Username - to start using TrackerBot\n"
+                        + "/createtask TaskName TaskDescription Queue [assignee] - to create a task with following parameters\n"
+                        + "/gettask TaskId - to find task by Id and show main info\n"
+                        + "/getQueues - to show all queues in Dashboard. Use it to create new tasks\n"
+                        + "/getMyTasks [number] - to get tasks where you are an assignee \n Use new line as a separator \n");
     }
 
-    public void Authorize(String chatId, String[] request) throws SQLException, TelegramApiException {
+    public void authorize(String chatId, String[] request) throws SQLException, TelegramApiException {
         if (request.length < 4) {
-            ShowInfo(chatId);
+            showInfo(chatId);
         } else {
-            Postgrdb.insertData(chatId, new BDInfo(request[1], request[2], request[3]));
+            postgrdb.insertData(chatId, new BDInfo(request[1], request[2], request[3]));
             sendMessage(chatId, "Authorization has been finished");
         }
     }
 
     private void sendMessage(String chatId, String text) throws TelegramApiException {
-        TGbot.execute(new SendMessage(chatId, text));
+        tgbot.execute(new SendMessage(chatId, text));
     }
 
-    public void GetTask(String chatId, String[] request) throws TelegramApiException {
-        var userInfo = Postgrdb.getData(chatId);
+    public void getTask(String chatId, String[] request) throws TelegramApiException {
+        var userInfo = postgrdb.getData(chatId);
         if (!userInfo.isPresent()) {
             sendMessage(chatId, "No Authorization has been provided");
             return;
         }
         if (request.length < 2) {
-            ShowInfo(chatId);
+            showInfo(chatId);
         } else {
             try {
-                var task = TrClient.getTask(userInfo.get().getToken(), userInfo.get().getOrg(), request[1]);
+                var task = trClient.getTask(userInfo.get().getToken(), userInfo.get().getOrg(), request[1]);
 
                 sendMessage(chatId, "task name: " + task.getName());
                 sendMessage(chatId, "description: " + task.getDescription());
@@ -99,7 +101,7 @@ public class MainProcess {
                 if (comments.size() > 0) {
                     sendMessage(chatId, "comments:");
                     for (var comment : comments) {
-                        sendMessage(chatId, comment.Author() + " comment " + comment.Text());
+                        sendMessage(chatId, comment.getAuthor() + " comment " + comment.getText());
                     }
                 }
 
@@ -120,9 +122,9 @@ public class MainProcess {
         }
     }
 
-    public void CreateTask(String chatId, String[] request) throws TelegramApiException {
+    public void createTask(String chatId, String[] request) throws TelegramApiException {
 
-        var userInfo = Postgrdb.getData(chatId);
+        var userInfo = postgrdb.getData(chatId);
         Optional<String> newTask;
 
         if (!userInfo.isPresent()) {
@@ -131,15 +133,15 @@ public class MainProcess {
         }
 
         if (request.length < 4) {
-            ShowInfo(chatId);
+            showInfo(chatId);
         } else {
             // no assignee
             if (request.length == 4) {
-                newTask = TrClient.createTask(userInfo.get().getToken(), userInfo.get().getOrg(), request[1],
+                newTask = trClient.createTask(userInfo.get().getToken(), userInfo.get().getOrg(), request[1],
                         request[2], Optional.empty(), request[3]);
             } // for user assign
             else {
-                newTask = TrClient.createTask(userInfo.get().getToken(), userInfo.get().getOrg(), request[1],
+                newTask = trClient.createTask(userInfo.get().getToken(), userInfo.get().getOrg(), request[1],
                         request[2], Optional.of(request[4]), request[3]);
             }
             if (newTask.isPresent()) {
@@ -150,8 +152,8 @@ public class MainProcess {
         }
     }
 
-    public void ShowMyTasks(String chatId, String[] request) throws TelegramApiException {
-        var userInfo = Postgrdb.getData(chatId);
+    public void showMyTasks(String chatId, String[] request) throws TelegramApiException {
+        var userInfo = postgrdb.getData(chatId);
 
         if (!userInfo.isPresent()) {
             sendMessage(chatId, "No Authorization has been provided");
@@ -159,7 +161,7 @@ public class MainProcess {
         }
 
         try {
-            var tasks = TrClient.getTasksByUser(userInfo.get().getToken(), userInfo.get().getOrg(),
+            var tasks = trClient.getTasksByUser(userInfo.get().getToken(), userInfo.get().getOrg(),
                     userInfo.get().getUsername());
             int maxTasks = 1;
             if (request.length > 1) {
@@ -190,15 +192,15 @@ public class MainProcess {
         }
     }
 
-    public void ShowQueues(String chatId) throws TelegramApiException {
+    public void showQueues(String chatId) throws TelegramApiException {
 
         try {
-            var userInfo = Postgrdb.getData(chatId);
+            var userInfo = postgrdb.getData(chatId);
             if (!userInfo.isPresent()) {
                 sendMessage(chatId, "No Authorization has been provided");
                 return;
             }
-            var queues = TrClient.getAllQueues(userInfo.get().getToken(), userInfo.get().getOrg());
+            var queues = trClient.getAllQueues(userInfo.get().getToken(), userInfo.get().getOrg());
 
             sendMessage(chatId, "Current queues:");
             for (var queue : queues) {

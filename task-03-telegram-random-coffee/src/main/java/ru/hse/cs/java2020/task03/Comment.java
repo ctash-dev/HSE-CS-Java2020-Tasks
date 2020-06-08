@@ -6,14 +6,14 @@ public class Comment {
         this.text = givenText;
     }
 
-    public String Author() {
+    private final String author;
+    private final String text;
+
+    public String getAuthor() {
         return author;
     }
 
-    public String Text() {
+    public String getText() {
         return text;
     }
-
-    private String author;
-    private String text;
 }

@@ -12,7 +12,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Optional;
 
-public class Client {
+public final class Client {
 
     private static final int TIMEOUT = 30;
     private final HttpClient client;
@@ -106,7 +106,7 @@ public class Client {
     Task getTask(String oauthToken, String orgID, String task)
             throws java.io.IOException, java.lang.InterruptedException, TrackerException {
 
-        HttpRequest MainRequest = HttpRequest.newBuilder()
+        HttpRequest mainRequest = HttpRequest.newBuilder()
                 .uri(URI.create(queryBasis + "issues/" + task))
                 .timeout(Duration.ofSeconds(TIMEOUT))
                 .headers("Authorization", "OAuth " + oauthToken,
@@ -114,7 +114,7 @@ public class Client {
                 .GET()
                 .build();
 
-        var response = client.send(MainRequest, HttpResponse.BodyHandlers.ofString());
+        var response = client.send(mainRequest, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() == 401 || response.statusCode() == 403 || response.statusCode() == 404 || response.statusCode() == 400) {
             throw new TrackerException(response.body());
         }
@@ -138,7 +138,7 @@ public class Client {
             }
         }
 
-        HttpRequest CommentRequest = HttpRequest.newBuilder()
+        HttpRequest commentRequest = HttpRequest.newBuilder()
                 .uri(URI.create(queryBasis + "issues/" + task + "/comments"))
                 .timeout(Duration.ofSeconds(TIMEOUT))
                 .headers("Authorization", "OAuth " + oauthToken,
@@ -146,7 +146,7 @@ public class Client {
                 .GET()
                 .build();
 
-        response = client.send(CommentRequest, HttpResponse.BodyHandlers.ofString());
+        response = client.send(commentRequest, HttpResponse.BodyHandlers.ofString());
         body = response.body();
 
         var comments = new JSONArray(body);
