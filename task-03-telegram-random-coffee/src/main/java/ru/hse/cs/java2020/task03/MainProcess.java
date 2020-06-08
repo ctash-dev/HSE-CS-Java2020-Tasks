@@ -15,12 +15,13 @@ public class MainProcess {
     private final int authLen = 4;
     private final int getTaskLen = 2;
     private final int three = 3;
-    private int counterPage = 0;
+    boolean counterzero = false;
 
     public MainProcess(Bot telegrambot, PostgrBD db, Client client) {
         tgbot = telegrambot;
         postgrdb = db;
         trClient = client;
+        counterzero = false;
     }
 
     public void updater(String chatId, String[] request) throws SQLException, TelegramApiException {
@@ -38,10 +39,11 @@ public class MainProcess {
                 showQueues(chatId);
                 break;
             case "/showmytasks":
-                counterPage = 0;
+                counterzero = true;
                 showMyTasks(chatId, request);
                 break;
             case "/continue":
+                counterzero = false;
                 showMyTasks(chatId, request);
                 break;
             default:
@@ -154,7 +156,13 @@ public class MainProcess {
         }
     }
 
-    public void showMyTasks(String chatId, String[] request) throws TelegramApiException {
+    public void showMyTasks(String chatId, String[] request) throws TelegramApiException, SQLException {
+
+        if (counterzero) {
+            postgrdb.updateCounter(chatId, 0);
+        }
+
+        int counterPage = postgrdb.getCounter(chatId);
         var userInfo = postgrdb.getData(chatId);
 
         if (!userInfo.isPresent()) {
@@ -177,6 +185,7 @@ public class MainProcess {
                 int temper = counterPage;
                 if (1 + temper > tasks.size()) {
                     sendMessage(chatId, "No more tasks!");
+                    postgrdb.updateCounter(chatId, 0);
                     return;
                 }
                 for (int i = temper; i < (maxTasks + temper) && i < tasks.size(); i++) {
@@ -184,6 +193,7 @@ public class MainProcess {
                     counterPage++;
                 }
                 sendMessage(chatId, "Max tasks on page. Type /continue to proceed");
+                postgrdb.updateCounter(chatId, counterPage);
                 return;
             }
             sendMessage(chatId, "No more tasks!");
