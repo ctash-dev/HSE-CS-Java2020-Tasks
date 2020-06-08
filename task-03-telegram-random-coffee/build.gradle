@@ -3,4 +3,6 @@ version '1.0'
 mainClassName = 'ru.hse.cs.java2020.task03.Main'
 
 dependencies {
+    compile group: 'org.telegram', name: 'telegrambots', version: '4.8.1'
+    implementation 'org.postgresql:postgresql:42.2.10'
 }
