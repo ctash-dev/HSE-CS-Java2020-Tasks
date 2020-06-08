@@ -2,17 +2,9 @@ package ru.hse.cs.java2020.task03;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.telegram.telegrambots.ApiContextInitializer;
-import org.telegram.telegrambots.meta.TelegramBotsApi;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -22,9 +14,9 @@ import java.util.Optional;
 
 public class Client {
 
-    private HttpClient client;
-    private String queryBasis = "https://api.tracker.yandex.net/v2/";
-    private static int TIMEOUT = 30;
+    private static final int TIMEOUT = 30;
+    private final HttpClient client;
+    private final String queryBasis = "https://api.tracker.yandex.net/v2/";
 
     ArrayList<QueueHashMap> getAllQueues(String oauthToken, String orgID)
             throws java.io.IOException, java.lang.InterruptedException {
